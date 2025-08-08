@@ -283,21 +283,17 @@ const LikeButton: React.FC<TLikeButton> = (props) => {
       <View
         style={{
           flexDirection: 'row',
-          shadowColor: 'gray',
-          shadowOffset: { width: 1, height: 2 },
-          shadowOpacity: 0.3,
-          shadowRadius: 6,
-          elevation: 5,
         }}
       >
         <Pressable onPress={handleClientPress}>
           <View
             style={{
-              width: 50,
-              height: 50,
-              borderRadius: 25,
+              width: LOGO_SIZE * 2,
+              height: LOGO_SIZE * 2,
+              borderRadius: LOGO_SIZE,
               alignItems: 'center',
               justifyContent: 'center',
+              overflow: 'visible',
             }}
           >
             <Animated.View
