@@ -3,15 +3,15 @@ import { StyleSheet } from 'react-native';
 export const createStyles = (logo_size: number) =>
   StyleSheet.create({
     container: {
-      flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: 'column',
-      paddingHorizontal: 20,
+      width: 'auto',
+
+      marginVertical: 10,
     },
 
     actionsContainer: {
-      marginBottom: 40,
       borderColor: 'black',
       borderWidth: 1,
       borderRadius: 10,

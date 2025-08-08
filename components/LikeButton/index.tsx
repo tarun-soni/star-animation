@@ -1,3 +1,4 @@
+import { TLikeButton } from '@/types/action';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import Animated, {
@@ -18,12 +19,12 @@ const CIRCLE_COLOR_NOT_SELECTED = '#C4C4C4';
 const LOGO_SIZE = 30;
 const styles = createStyles(LOGO_SIZE);
 
-const LikeButton = () => {
+const LikeButton: React.FC<TLikeButton> = (props) => {
+  const { updateButtonStatus, id, isHeartSelected, isStarSelected } = props;
+
   const [isOpen, setIsOpen] = useState(false);
-  const [isSelected, setIsSelected] = useState(false);
   const lastTapRef = useRef<number>(0);
 
-  // Animation values using react-native-reanimated
   const starContainerAnim = useSharedValue(0);
   const heartScaleAnim = useSharedValue(1);
   const heartTranslateXAnim = useSharedValue(0);
@@ -97,12 +98,12 @@ const LikeButton = () => {
           withTiming(1, { duration: 70, easing: Easing.out(Easing.cubic) })
         );
       } else {
-        // Stop any in-flight animations so opening feels crisp
+        // Stop any in-flight animations
         cancelAnimation(heartScaleAnim);
         cancelAnimation(heartTranslateXAnim);
         cancelAnimation(circleScaleAnim);
 
-        // Opening: reverse of merge — bubble flares, circle micro-bounces, heart emerges
+        // Opening: reverse of merge
         heartScaleAnim.value = withSequence(
           withTiming(0.98, { duration: 70, easing: Easing.out(Easing.quad) }),
           withTiming(0.98, { duration: 70, easing: Easing.out(Easing.quad) }),
@@ -186,12 +187,11 @@ const LikeButton = () => {
   useEffect(() => {
     if (isOpen) {
       // Clear any existing timeout to reset the timer
-
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
 
-      // Set new timeout for auto-close after 3 seconds (increased for better UX)
+      // Set new timeout for auto-close after 3 seconds
       timeoutRef.current = setTimeout(() => {
         setIsOpen(false);
         animateStarContainer(0);
@@ -213,9 +213,7 @@ const LikeButton = () => {
     };
   }, [isOpen, animateStarContainer, animateHeartBounce]);
 
-  // Handle press with improved user action prioritization
-  const handlePress = () => {
-    // Always clear existing timeout first - user action takes priority
+  const commonHandlePress = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
@@ -236,7 +234,11 @@ const LikeButton = () => {
 
     if (lastTapRef.current && now - lastTapRef.current < DOUBLE_TAP_DELAY) {
       // Double tap detected - unselect and close client immediately
-      setIsSelected(false);
+      updateButtonStatus({
+        id,
+        isHeartSelected: false,
+        isStarSelected: false,
+      });
 
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -252,40 +254,32 @@ const LikeButton = () => {
     } else {
       // Single tap - normal behavior
       lastTapRef.current = now;
-      handlePress();
+      commonHandlePress();
+      updateButtonStatus({
+        id,
+        isHeartSelected: true,
+        isStarSelected,
+      });
     }
   };
 
   const handleClientPress = () => {
-    setIsSelected(!isSelected);
-    handlePress();
+    updateButtonStatus({
+      id,
+      isHeartSelected,
+      isStarSelected: !isStarSelected,
+    });
+    commonHandlePress();
   };
 
-  const heartNotFilled = require('../assets/images/heart-not-filled.png');
-  const heartFilled = require('../assets/images/heart-filled.png');
+  const heartNotFilled = require('../../assets/images/heart-not-filled.png');
+  const heartFilled = require('../../assets/images/heart-filled.png');
 
-  const starFilled = require('../assets/images/star-filled.png');
-  const starNotFilled = require('../assets/images/star-not-filled.png');
+  const starFilled = require('../../assets/images/star-filled.png');
+  const starNotFilled = require('../../assets/images/star-not-filled.png');
 
   return (
     <View style={styles.container}>
-      {/* client button */}
-
-      <View style={styles.actionsContainer}>
-        <Text style={styles.actionText}>Required Actions</Text>
-        <Text style={styles.actionText}>1. Single tap - opens client</Text>
-        <Text style={styles.actionText}>
-          2. Single tap - opens client and click client to mark it as liked
-        </Text>
-        <Text style={styles.actionText}>
-          3. Double tap - unselect and close client (if selected)
-        </Text>
-
-        <Text style={styles.actionText}>
-          4. Single tap - Client Auto Close after 2 seconds
-        </Text>
-      </View>
-
       <View style={{ flexDirection: 'row' }}>
         <Pressable onPress={handleClientPress}>
           <View
@@ -300,7 +294,7 @@ const LikeButton = () => {
             <Animated.View
               style={[styles.starContainer, starContainerAnimatedStyle]}
             >
-              {isSelected ? (
+              {isStarSelected ? (
                 <Image source={starFilled} style={{ width: 35, height: 35 }} />
               ) : (
                 <Image
@@ -323,25 +317,14 @@ const LikeButton = () => {
 
         {/* circle button */}
         <Pressable style={[styles.circleContainer]} onPress={handleHeartPress}>
-          {/* Bubble effect layer behind the circle */}
-          <Animated.View
-            style={[
-              styles.bubbleEffect,
-
-              {
-                backgroundColor: CIRCLE_COLOR + '30', // 30% opacity
-              },
-            ]}
-          />
-
           <Animated.View
             style={[
               styles.circle,
               circleAnimatedStyle,
               {
-                borderColor: isSelected
+                borderColor: isHeartSelected
                   ? CIRCLE_COLOR
-                  : isOpen || isSelected
+                  : isOpen || isHeartSelected
                   ? CIRCLE_COLOR
                   : CIRCLE_COLOR_NOT_SELECTED,
               },
@@ -349,12 +332,14 @@ const LikeButton = () => {
           >
             <Animated.View style={heartAnimatedStyle}>
               <Image
-                source={isSelected ? heartFilled : heartNotFilled}
+                source={isHeartSelected ? heartFilled : heartNotFilled}
                 style={[styles.heartImage]}
               />
             </Animated.View>
           </Animated.View>
-          {isSelected && <Image source={starFilled} style={styles.starImage} />}
+          {isStarSelected && (
+            <Image source={starFilled} style={styles.starImage} />
+          )}
         </Pressable>
       </View>
     </View>
