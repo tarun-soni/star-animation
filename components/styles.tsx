@@ -5,8 +5,25 @@ export const createStyles = (logo_size: number) =>
     container: {
       flex: 1,
       alignItems: 'center',
-      flexDirection: 'row',
+      justifyContent: 'center',
+      flexDirection: 'column',
       paddingHorizontal: 20,
+    },
+
+    actionsContainer: {
+      marginBottom: 40,
+      borderColor: 'black',
+      borderWidth: 1,
+      borderRadius: 10,
+      padding: 10,
+      backgroundColor: 'white',
+    },
+
+    actionText: {
+      fontSize: 12,
+
+      color: 'black',
+      fontWeight: 'bold',
     },
     starContainer: {
       width: logo_size * 2,

@@ -271,72 +271,92 @@ const LikeButton = () => {
     <View style={styles.container}>
       {/* client button */}
 
-      <Pressable onPress={handleClientPress}>
-        <View
-          style={{
-            width: 50,
-            height: 50,
-            borderRadius: 25,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Animated.View
-            style={[styles.starContainer, starContainerAnimatedStyle]}
+      <View style={styles.actionsContainer}>
+        <Text style={styles.actionText}>Required Actions</Text>
+        <Text style={styles.actionText}>1. Single tap - opens client</Text>
+        <Text style={styles.actionText}>
+          2. Single tap - opens client and click client to mark it as liked
+        </Text>
+        <Text style={styles.actionText}>
+          3. Double tap - unselect and close client (if selected)
+        </Text>
+
+        <Text style={styles.actionText}>
+          4. Single tap - Client Auto Close after 2 seconds
+        </Text>
+      </View>
+
+      <View style={{ flexDirection: 'row' }}>
+        <Pressable onPress={handleClientPress}>
+          <View
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: 25,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            {isSelected ? (
-              <Image source={starFilled} style={{ width: 35, height: 35 }} />
-            ) : (
-              <Image source={starNotFilled} style={{ width: 35, height: 35 }} />
-            )}
-
-            <Text
-              maxFontSizeMultiplier={1}
-              style={{
-                fontSize: 10,
-              }}
+            <Animated.View
+              style={[styles.starContainer, starContainerAnimatedStyle]}
             >
-              Client
-            </Text>
+              {isSelected ? (
+                <Image source={starFilled} style={{ width: 35, height: 35 }} />
+              ) : (
+                <Image
+                  source={starNotFilled}
+                  style={{ width: 35, height: 35 }}
+                />
+              )}
+
+              <Text
+                maxFontSizeMultiplier={1}
+                style={{
+                  fontSize: 10,
+                }}
+              >
+                Client
+              </Text>
+            </Animated.View>
+          </View>
+        </Pressable>
+
+        {/* circle button */}
+        <Pressable style={[styles.circleContainer]} onPress={handleHeartPress}>
+          {/* Bubble effect layer behind the circle */}
+          <Animated.View
+            style={[
+              styles.bubbleEffect,
+
+              {
+                backgroundColor: CIRCLE_COLOR + '30', // 30% opacity
+              },
+            ]}
+          />
+
+          <Animated.View
+            style={[
+              styles.circle,
+              circleAnimatedStyle,
+              {
+                borderColor: isSelected
+                  ? CIRCLE_COLOR
+                  : isOpen || isSelected
+                  ? CIRCLE_COLOR
+                  : CIRCLE_COLOR_NOT_SELECTED,
+              },
+            ]}
+          >
+            <Animated.View style={heartAnimatedStyle}>
+              <Image
+                source={isSelected ? heartFilled : heartNotFilled}
+                style={[styles.heartImage]}
+              />
+            </Animated.View>
           </Animated.View>
-        </View>
-      </Pressable>
-
-      {/* circle button */}
-      <Pressable style={[styles.circleContainer]} onPress={handleHeartPress}>
-        {/* Bubble effect layer behind the circle */}
-        <Animated.View
-          style={[
-            styles.bubbleEffect,
-
-            {
-              backgroundColor: CIRCLE_COLOR + '30', // 30% opacity
-            },
-          ]}
-        />
-
-        <Animated.View
-          style={[
-            styles.circle,
-            circleAnimatedStyle,
-            {
-              borderColor: isSelected
-                ? CIRCLE_COLOR
-                : isOpen || isSelected
-                ? CIRCLE_COLOR
-                : CIRCLE_COLOR_NOT_SELECTED,
-            },
-          ]}
-        >
-          <Animated.View style={heartAnimatedStyle}>
-            <Image
-              source={isSelected ? heartFilled : heartNotFilled}
-              style={[styles.heartImage]}
-            />
-          </Animated.View>
-        </Animated.View>
-        {isSelected && <Image source={starFilled} style={styles.starImage} />}
-      </Pressable>
+          {isSelected && <Image source={starFilled} style={styles.starImage} />}
+        </Pressable>
+      </View>
     </View>
   );
 };
