@@ -280,7 +280,16 @@ const LikeButton: React.FC<TLikeButton> = (props) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ flexDirection: 'row' }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          shadowColor: 'gray',
+          shadowOffset: { width: 1, height: 2 },
+          shadowOpacity: 0.3,
+          shadowRadius: 6,
+          elevation: 5,
+        }}
+      >
         <Pressable onPress={handleClientPress}>
           <View
             style={{

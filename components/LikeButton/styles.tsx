@@ -11,32 +11,14 @@ export const createStyles = (logo_size: number) =>
       marginVertical: 10,
     },
 
-    actionsContainer: {
-      borderColor: 'black',
-      borderWidth: 1,
-      borderRadius: 10,
-      padding: 10,
-      backgroundColor: 'white',
-    },
-
-    actionText: {
-      fontSize: 12,
-
-      color: 'black',
-      fontWeight: 'bold',
-    },
     starContainer: {
       width: logo_size * 2,
       height: logo_size * 2,
-
-      borderColor: 'white',
-
+      borderColor: '#D5FCDB',
       overflow: 'hidden',
-
       borderWidth: 1,
       borderRadius: logo_size,
       alignItems: 'center',
-
       backgroundColor: '#D5FCDB',
     },
     circleContainer: {
