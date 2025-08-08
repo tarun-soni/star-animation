@@ -29,8 +29,6 @@ const LikeButton = () => {
   const heartScaleAnim = useSharedValue(1);
   const heartTranslateXAnim = useSharedValue(0);
   const circleScaleAnim = useSharedValue(1);
-  const bubbleOpacityAnim = useSharedValue(0);
-  const bubbleScaleAnim = useSharedValue(0.5);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const animateStarContainer = useCallback(
     (toValue: number) => {
@@ -63,8 +61,6 @@ const LikeButton = () => {
         cancelAnimation(heartScaleAnim);
         cancelAnimation(heartTranslateXAnim);
         cancelAnimation(circleScaleAnim);
-        cancelAnimation(bubbleOpacityAnim);
-        cancelAnimation(bubbleScaleAnim);
 
         // Heart merge: quick overshoot + ultra-fast micro-oscillation, then settle
         heartScaleAnim.value = withSequence(
@@ -91,7 +87,6 @@ const LikeButton = () => {
           withTiming(0, { duration: 60, easing: Easing.out(Easing.cubic) })
         );
 
-        // Circle bubble effect: quick expansion + ultra-fast micro-oscillation, then settle
         circleScaleAnim.value = withSequence(
           withTiming(1.2, {
             duration: 110,
@@ -102,33 +97,19 @@ const LikeButton = () => {
           withTiming(0.995, { duration: 45, easing: Easing.out(Easing.quad) }),
           withTiming(1, { duration: 70, easing: Easing.out(Easing.cubic) })
         );
-
-        // Bubble opacity effect - appear then fade out quickly on close
-        bubbleOpacityAnim.value = withSequence(
-          withTiming(0.5, { duration: 120, easing: Easing.out(Easing.quad) }),
-          withTiming(0, { duration: 260, easing: Easing.out(Easing.cubic) })
-        );
-
-        // Bubble scale effect: expand + ultra-fast micro-oscillation, then settle
-        bubbleScaleAnim.value = withSequence(
-          withTiming(1.6, { duration: 110, easing: Easing.out(Easing.quad) }),
-          withTiming(0.98, { duration: 90, easing: Easing.out(Easing.quad) }),
-          withTiming(1.05, { duration: 45, easing: Easing.out(Easing.quad) }),
-          withTiming(1, { duration: 60, easing: Easing.out(Easing.cubic) })
-        );
       } else {
         // Stop any in-flight animations so opening feels crisp
         cancelAnimation(heartScaleAnim);
         cancelAnimation(heartTranslateXAnim);
         cancelAnimation(circleScaleAnim);
-        cancelAnimation(bubbleOpacityAnim);
-        cancelAnimation(bubbleScaleAnim);
 
         // Opening: reverse of merge — bubble flares, circle micro-bounces, heart emerges
         heartScaleAnim.value = withSequence(
           withTiming(0.98, { duration: 70, easing: Easing.out(Easing.quad) }),
+          withTiming(0.98, { duration: 70, easing: Easing.out(Easing.quad) }),
+          withTiming(1.01, { duration: 45, easing: Easing.out(Easing.quad) }),
           withTiming(1.02, { duration: 45, easing: Easing.out(Easing.quad) }),
-          withTiming(0.995, { duration: 45, easing: Easing.out(Easing.quad) }),
+          withTiming(1.01, { duration: 45, easing: Easing.out(Easing.quad) }),
           withTiming(1.06, {
             duration: 90,
             easing: Easing.out(Easing.back(1.05)),
@@ -159,26 +140,9 @@ const LikeButton = () => {
           }),
           withTiming(1, { duration: 90, easing: Easing.out(Easing.cubic) })
         );
-
-        // Bubble flare and fade
-        bubbleOpacityAnim.value = withSequence(
-          withTiming(0.4, { duration: 80, easing: Easing.out(Easing.quad) }),
-          withTiming(0, { duration: 200, easing: Easing.out(Easing.cubic) })
-        );
-        bubbleScaleAnim.value = withSequence(
-          withTiming(1.55, { duration: 100, easing: Easing.out(Easing.quad) }),
-          withTiming(0.98, { duration: 70, easing: Easing.out(Easing.quad) }),
-          withTiming(1, { duration: 120, easing: Easing.out(Easing.cubic) })
-        );
       }
     },
-    [
-      heartScaleAnim,
-      heartTranslateXAnim,
-      circleScaleAnim,
-      bubbleOpacityAnim,
-      bubbleScaleAnim,
-    ]
+    [heartScaleAnim, heartTranslateXAnim, circleScaleAnim]
   );
 
   // Animated styles
@@ -219,13 +183,6 @@ const LikeButton = () => {
     };
   });
 
-  const bubbleAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: bubbleOpacityAnim.value,
-      transform: [{ scale: bubbleScaleAnim.value }],
-    };
-  });
-
   // Auto-close functionality with better user action prioritization
   useEffect(() => {
     if (isOpen) {
@@ -236,11 +193,11 @@ const LikeButton = () => {
       }
 
       // Set new timeout for auto-close after 3 seconds (increased for better UX)
-      // timeoutRef.current = setTimeout(() => {
-      //   setIsOpen(false);
-      //   animateStarContainer(0);
-      //   animateHeartBounce(true);
-      // }, 3000);
+      timeoutRef.current = setTimeout(() => {
+        setIsOpen(false);
+        animateStarContainer(0);
+        animateHeartBounce(true);
+      }, 3000);
     } else {
       // Clear timeout when manually closed
       if (timeoutRef.current) {
@@ -255,7 +212,7 @@ const LikeButton = () => {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [isOpen, animateStarContainer]);
+  }, [isOpen, animateStarContainer, animateHeartBounce]);
 
   // Handle press with improved user action prioritization
   const handlePress = () => {
@@ -308,7 +265,14 @@ const LikeButton = () => {
               <Image source={starNotFilled} style={{ width: 35, height: 35 }} />
             )}
 
-            <Text style={{ fontSize: 12 }}>Client</Text>
+            <Text
+              maxFontSizeMultiplier={1}
+              style={{
+                fontSize: 10,
+              }}
+            >
+              Client
+            </Text>
           </Animated.View>
         </View>
       </Pressable>
@@ -319,7 +283,7 @@ const LikeButton = () => {
         <Animated.View
           style={[
             styles.bubbleEffect,
-            bubbleAnimatedStyle,
+
             {
               backgroundColor: CIRCLE_COLOR + '30', // 30% opacity
             },
