@@ -14,8 +14,6 @@ import { createStyles } from './styles';
 
 const CIRCLE_COLOR = '#0456534D';
 const CIRCLE_COLOR_NOT_SELECTED = '#C4C4C4';
-// const CIRCLE_COLOR_NOT_SELECTED = '#C4C4C44D';
-// #0456534D
 
 const LOGO_SIZE = 30;
 const styles = createStyles(LOGO_SIZE);

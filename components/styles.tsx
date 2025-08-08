@@ -13,8 +13,8 @@ export const createStyles = (logo_size: number) =>
       height: logo_size * 2,
 
       borderColor: 'white',
-      // justifyContent: 'flex-end',
-      overflow: 'hidden', // Prevent image overflow
+
+      overflow: 'hidden',
 
       borderWidth: 1,
       borderRadius: logo_size,
