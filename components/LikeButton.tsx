@@ -23,6 +23,7 @@ const styles = createStyles(LOGO_SIZE);
 const LikeButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
+  const lastTapRef = useRef<number>(0);
 
   // Animation values using react-native-reanimated
   const starContainerAnim = useSharedValue(0);
@@ -197,7 +198,7 @@ const LikeButton = () => {
         setIsOpen(false);
         animateStarContainer(0);
         animateHeartBounce(true);
-      }, 3000);
+      }, 2000);
     } else {
       // Clear timeout when manually closed
       if (timeoutRef.current) {
@@ -229,6 +230,32 @@ const LikeButton = () => {
     const isClosing = !newIsOpen;
     // Always animate heart on any press (independent of open/close)
     animateHeartBounce(isClosing);
+  };
+
+  const handleHeartPress = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (lastTapRef.current && now - lastTapRef.current < DOUBLE_TAP_DELAY) {
+      // Double tap detected - unselect and close client immediately
+      setIsSelected(false);
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+
+      // Ensure client/star container is closed with closing animation
+      setIsOpen(false);
+      animateStarContainer(0);
+      animateHeartBounce(true);
+
+      lastTapRef.current = 0; // Reset to prevent triple tap
+    } else {
+      // Single tap - normal behavior
+      lastTapRef.current = now;
+      handlePress();
+    }
   };
 
   const handleClientPress = () => {
@@ -278,7 +305,7 @@ const LikeButton = () => {
       </Pressable>
 
       {/* circle button */}
-      <Pressable style={[styles.circleContainer]} onPress={handlePress}>
+      <Pressable style={[styles.circleContainer]} onPress={handleHeartPress}>
         {/* Bubble effect layer behind the circle */}
         <Animated.View
           style={[
