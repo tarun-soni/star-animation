@@ -117,40 +117,59 @@ const LikeButton = () => {
           withTiming(1, { duration: 60, easing: Easing.out(Easing.cubic) })
         );
       } else {
-        // Opening animation - slightly reduced overshoot
+        // Stop any in-flight animations so opening feels crisp
+        cancelAnimation(heartScaleAnim);
+        cancelAnimation(heartTranslateXAnim);
+        cancelAnimation(circleScaleAnim);
+        cancelAnimation(bubbleOpacityAnim);
+        cancelAnimation(bubbleScaleAnim);
+
+        // Opening: reverse of merge — bubble flares, circle micro-bounces, heart emerges
         heartScaleAnim.value = withSequence(
-          withTiming(0.65, {
-            duration: 100,
-            easing: Easing.in(Easing.back(1.0)),
+          withTiming(0.98, { duration: 70, easing: Easing.out(Easing.quad) }),
+          withTiming(1.02, { duration: 45, easing: Easing.out(Easing.quad) }),
+          withTiming(0.995, { duration: 45, easing: Easing.out(Easing.quad) }),
+          withTiming(1.06, {
+            duration: 90,
+            easing: Easing.out(Easing.back(1.05)),
           }),
-          withSpring(1.2, { damping: 8, stiffness: 580, mass: 0.3 }),
-          withSpring(0.9, { damping: 9, stiffness: 480, mass: 0.4 }),
-          withSpring(1.08, { damping: 10, stiffness: 420, mass: 0.5 }),
-          withSpring(0.98, { damping: 12, stiffness: 320, mass: 0.6 }),
-          withSpring(1, { damping: 20, stiffness: 240, mass: 0.8 })
+          withTiming(1, { duration: 90, easing: Easing.out(Easing.cubic) })
         );
 
-        // Gentle return to center with bounce
-        heartTranslateXAnim.value = withSpring(0, {
-          damping: 15,
-          stiffness: 300,
-          mass: 0.8,
-        });
+        // Tiny left nudge then settle with micro correction
+        heartTranslateXAnim.value = withSequence(
+          withTiming(-10, {
+            duration: 70,
+            easing: Easing.out(Easing.back(1.0)),
+          }),
+          withTiming(0, { duration: 120, easing: Easing.out(Easing.cubic) }),
+          withTiming(1, { duration: 35, easing: Easing.out(Easing.quad) }),
+          withTiming(0, { duration: 50, easing: Easing.out(Easing.cubic) })
+        );
 
-        // Circle animation for opening
+        // Circle quick mini-bounce instead of micro-bounce hence updating values accordingly
         circleScaleAnim.value = withSequence(
-          withTiming(0.8, {
-            duration: 100,
-            easing: Easing.in(Easing.back(1.1)),
+          withTiming(1.3, {
+            duration: 80,
+            easing: Easing.out(Easing.back(1.0)),
           }),
-          withSpring(1.2, { damping: 8, stiffness: 500, mass: 0.4 }),
-          withSpring(0.95, { damping: 10, stiffness: 400, mass: 0.5 }),
-          withSpring(1, { damping: 15, stiffness: 300, mass: 0.8 })
+          withTiming(1.08, {
+            duration: 60,
+            easing: Easing.out(Easing.back(1.0)),
+          }),
+          withTiming(1, { duration: 90, easing: Easing.out(Easing.cubic) })
         );
 
-        // Reset bubble effects
-        bubbleOpacityAnim.value = withTiming(0, { duration: 100 });
-        bubbleScaleAnim.value = withTiming(0.5, { duration: 100 });
+        // Bubble flare and fade
+        bubbleOpacityAnim.value = withSequence(
+          withTiming(0.4, { duration: 80, easing: Easing.out(Easing.quad) }),
+          withTiming(0, { duration: 200, easing: Easing.out(Easing.cubic) })
+        );
+        bubbleScaleAnim.value = withSequence(
+          withTiming(1.55, { duration: 100, easing: Easing.out(Easing.quad) }),
+          withTiming(0.98, { duration: 70, easing: Easing.out(Easing.quad) }),
+          withTiming(1, { duration: 120, easing: Easing.out(Easing.cubic) })
+        );
       }
     },
     [
